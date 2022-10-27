@@ -10,19 +10,15 @@ import (
 )
 
 func TodoCreate(c *gin.Context) {
-	// Get data off re body
+	// Get data off req body
 	var body struct {
-		ActivityGroupId string
+		ActivityGroupId string `json:"activity_group_id"`
 		Title           string
 		IsActive        bool
 		Priority        string
 	}
 
 	c.BindJSON(&body)
-	fmt.Println(body.Title)
-	fmt.Println(body.ActivityGroupId)
-	fmt.Println(body.IsActive)
-	fmt.Println(body.Priority)
 
 	// Validate request body
 	if body.ActivityGroupId == "" {
@@ -131,7 +127,6 @@ func TodoUpdate(c *gin.Context) {
 	var body struct {
 		Title    string
 		IsActive bool
-		// Priority string
 	}
 
 	c.Bind(&body)
