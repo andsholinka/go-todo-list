@@ -11,8 +11,8 @@ import (
 func ActivityCreate(c *gin.Context) {
 	// Get data off re body
 	var body struct {
-		Title string
-		Email string
+		Title string `json:"title"`
+		Email string `json:"email"`
 	}
 
 	c.Bind(&body)
@@ -36,9 +36,9 @@ func ActivityCreate(c *gin.Context) {
 	}
 
 	// Return it
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  "Success",
+		"message": "Success",
 		"data":    activity,
 	})
 }
@@ -50,8 +50,8 @@ func ActivityIndex(c *gin.Context) {
 
 	// Respond with them
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+		"status":  "Success",
+		"message": "Success",
 		"data":    activities,
 	})
 }
@@ -65,19 +65,18 @@ func ActivityShow(c *gin.Context) {
 	initializers.DB.First(&activity, id)
 
 	// Validate
-	if activity.Title == "" {
-		// fmt.Println("record not found")
+	if activity.ID <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
-			"message": `Activity with ID Not Found`,
+			"message": "Activity with ID " + id + " Not Found",
 		})
 		return
 	}
 
 	// Respond with them
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+		"status":  "Success",
+		"message": "Success",
 		"data":    activity,
 	})
 }
@@ -88,8 +87,8 @@ func ActivityUpdate(c *gin.Context) {
 
 	// Get data off re body
 	var body struct {
-		Title string
-		Email string
+		Title string `json:"title"`
+		Email string `json:"email"`
 	}
 
 	c.Bind(&body)
@@ -99,10 +98,10 @@ func ActivityUpdate(c *gin.Context) {
 	initializers.DB.First(&activity, id)
 
 	// Validate
-	if activity.Title == "" {
+	if activity.ID <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
-			"message": `Activity with ID Not Found`,
+			"message": "Activity with ID " + id + " Not Found",
 		})
 		return
 	}
@@ -115,8 +114,8 @@ func ActivityUpdate(c *gin.Context) {
 
 	// Respond with them
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+		"status":  "Success",
+		"message": "Success",
 		"data":    activity,
 	})
 }
@@ -130,10 +129,10 @@ func ActivityDelete(c *gin.Context) {
 	initializers.DB.First(&activity, id)
 
 	// Validate
-	if activity.Title == "" {
+	if activity.ID <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
-			"message": `Activity with ID Not Found`,
+			"message": "Activity with ID " + id + " Not Found",
 		})
 		return
 	}

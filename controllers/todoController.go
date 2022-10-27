@@ -13,7 +13,7 @@ func TodoCreate(c *gin.Context) {
 	// Get data off req body
 	var body struct {
 		ActivityGroupId string `json:"activity_group_id"`
-		Title           string
+		Title           string `json:"title"`
 		IsActive        bool
 		Priority        string
 	}
@@ -21,20 +21,19 @@ func TodoCreate(c *gin.Context) {
 	c.BindJSON(&body)
 
 	// Validate request body
-	if body.ActivityGroupId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "Bad Request",
-			"message": "activity_group_id cannot be null",
-		})
-		return
-	}
-
 	if body.Title == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  "Bad Request",
 			"message": "title cannot be null",
 		})
 		return
+	} else if body.ActivityGroupId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  "Bad Request",
+			"message": "activity_group_id cannot be null",
+		})
+		return
+
 	}
 
 	// Create a post
@@ -52,9 +51,9 @@ func TodoCreate(c *gin.Context) {
 	}
 
 	// Return it
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  "Success",
+		"message": "Success",
 		"data":    todo,
 	})
 }
@@ -73,8 +72,8 @@ func TodoIndex(c *gin.Context) {
 
 		// Respond with them
 		c.JSON(http.StatusOK, gin.H{
-			"status":  "Sukses",
-			"message": "Sukses",
+			"status":  "Success",
+			"message": "Success",
 			"data":    todos,
 		})
 		return
@@ -87,11 +86,10 @@ func TodoIndex(c *gin.Context) {
 
 	// Respond with them
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+		"status":  "Success",
+		"message": "Success",
 		"data":    todos,
 	})
-
 }
 
 func TodoShow(c *gin.Context) {
@@ -106,15 +104,15 @@ func TodoShow(c *gin.Context) {
 	if todo.Title == "" {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
-			"message": `Todo with ID Not Found`,
+			"message": "Todo with ID " + id + " Not Found",
 		})
 		return
 	}
 
 	// Respond with them
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+		"status":  "Success",
+		"message": "Success",
 		"data":    todo,
 	})
 }
@@ -125,8 +123,8 @@ func TodoUpdate(c *gin.Context) {
 
 	// Get data off re body
 	var body struct {
-		Title    string
-		IsActive bool
+		Title    string `json:"title"`
+		IsActive bool   `json:"is_active"`
 	}
 
 	c.Bind(&body)
@@ -139,7 +137,7 @@ func TodoUpdate(c *gin.Context) {
 	if todo.Title == "" {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
-			"message": `Todo with ID Not Found`,
+			"message": "Todo with ID " + id + " Not Found",
 		})
 		return
 	}
@@ -152,8 +150,8 @@ func TodoUpdate(c *gin.Context) {
 
 	// Respond with them
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Sukses",
-		"message": "Sukses",
+		"status":  "Success",
+		"message": "Success",
 		"data":    todo,
 	})
 }
@@ -170,7 +168,7 @@ func TodoDelete(c *gin.Context) {
 	if todo.Title == "" {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
-			"message": `Todo with ID Not Found`,
+			"message": "Todo with ID " + id + " Not Found",
 		})
 		return
 	}
