@@ -11,4 +11,5 @@ func init() {
 
 func main() {
 	initializers.DB.AutoMigrate(&models.Activity{})
+	initializers.DB.AutoMigrate(&models.Todo{})
 }

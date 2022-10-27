@@ -8,12 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Home(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Welcome to API TODO",
-	})
-}
-
 func ActivityCreate(c *gin.Context) {
 	// Get data off re body
 	var body struct {
