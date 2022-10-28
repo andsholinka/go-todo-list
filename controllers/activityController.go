@@ -9,7 +9,7 @@ import (
 )
 
 func ActivityCreate(c *gin.Context) {
-	// Get data off re body
+	// Get data off req body
 	var body struct {
 		Title string `json:"title"`
 		Email string `json:"email"`
@@ -85,14 +85,6 @@ func ActivityUpdate(c *gin.Context) {
 	// Get id from url
 	id := c.Param("id")
 
-	// Get data off re body
-	var body struct {
-		Title string `json:"title"`
-		Email string `json:"email"`
-	}
-
-	c.Bind(&body)
-
 	// Find the data were updating
 	var activity models.Activity
 	initializers.DB.First(&activity, id)
@@ -105,6 +97,14 @@ func ActivityUpdate(c *gin.Context) {
 		})
 		return
 	}
+
+	// Get data off req body
+	var body struct {
+		Title string `json:"title"`
+		Email string `json:"email"`
+	}
+
+	c.Bind(&body)
 
 	// Update it
 	initializers.DB.Model(&activity).Updates(models.Activity{
@@ -121,6 +121,10 @@ func ActivityUpdate(c *gin.Context) {
 }
 
 func ActivityDelete(c *gin.Context) {
+
+	var data struct {
+	}
+
 	// Get id from url
 	id := c.Param("id")
 
@@ -133,6 +137,7 @@ func ActivityDelete(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
 			"message": "Activity with ID " + id + " Not Found",
+			"data":    data,
 		})
 		return
 	}
@@ -141,5 +146,9 @@ func ActivityDelete(c *gin.Context) {
 	initializers.DB.Delete(&models.Activity{}, id)
 
 	// Respond
-	c.Status(200)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Success",
+		"data":    data,
+	})
 }

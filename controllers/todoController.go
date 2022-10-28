@@ -12,37 +12,41 @@ import (
 func TodoCreate(c *gin.Context) {
 	// Get data off req body
 	var body struct {
-		ActivityGroupId string `json:"activity_group_id"`
+		ActivityGroupId uint   `json:"activity_group_id"`
 		Title           string `json:"title"`
 		IsActive        bool
 		Priority        string
 	}
 
-	c.BindJSON(&body)
+	c.Bind(&body)
 
 	// Validate request body
+	if !body.IsActive {
+		body.IsActive = true
+	}
+
+	if body.Priority == "" {
+		body.Priority = "very-high"
+	}
+
 	if body.Title == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  "Bad Request",
 			"message": "title cannot be null",
 		})
 		return
-	} else if body.ActivityGroupId == "" {
+	}
+
+	if body.ActivityGroupId <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  "Bad Request",
 			"message": "activity_group_id cannot be null",
 		})
 		return
-
 	}
 
 	// Create a post
-	todo := models.Todo{
-		ActivityGroupId: body.ActivityGroupId,
-		Title:           body.Title,
-		IsActive:        true,
-		Priority:        "very-high",
-	}
+	todo := models.Todo{ActivityGroupId: body.ActivityGroupId, Title: body.Title, IsActive: body.IsActive, Priority: body.Priority}
 	result := initializers.DB.Create(&todo)
 
 	if result.Error != nil {
@@ -101,7 +105,7 @@ func TodoShow(c *gin.Context) {
 	initializers.DB.First(&todo, id)
 
 	// Validate
-	if todo.Title == "" {
+	if todo.ID <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
 			"message": "Todo with ID " + id + " Not Found",
@@ -121,20 +125,12 @@ func TodoUpdate(c *gin.Context) {
 	// Get id from url
 	id := c.Param("id")
 
-	// Get data off re body
-	var body struct {
-		Title    string `json:"title"`
-		IsActive bool   `json:"is_active"`
-	}
-
-	c.Bind(&body)
-
 	// Find the data were updating
 	var todo models.Todo
 	initializers.DB.First(&todo, id)
 
 	// Validate
-	if todo.Title == "" {
+	if todo.ID <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
 			"message": "Todo with ID " + id + " Not Found",
@@ -142,10 +138,22 @@ func TodoUpdate(c *gin.Context) {
 		return
 	}
 
+	// Get data off req body
+	var body struct {
+		ActivityGroupId uint   `json:"activity_group_id"`
+		Title           string `json:"title"`
+		IsActive        bool   `json:"is_active" form:"is_active"`
+		Priority        string `gorm:"default:very-high" json:"priority" form:"priority"`
+	}
+
+	c.Bind(&body)
+
 	// Update it
 	initializers.DB.Model(&todo).Updates(models.Todo{
-		Title:    body.Title,
-		IsActive: body.IsActive,
+		ActivityGroupId: body.ActivityGroupId,
+		Title:           body.Title,
+		IsActive:        body.IsActive,
+		Priority:        body.Priority,
 	})
 
 	// Respond with them
@@ -157,6 +165,9 @@ func TodoUpdate(c *gin.Context) {
 }
 
 func TodoDelete(c *gin.Context) {
+	var data struct {
+	}
+
 	// Get id from url
 	id := c.Param("id")
 
@@ -165,10 +176,11 @@ func TodoDelete(c *gin.Context) {
 	initializers.DB.First(&todo, id)
 
 	// Validate
-	if todo.Title == "" {
+	if todo.ID <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  "Not Found",
 			"message": "Todo with ID " + id + " Not Found",
+			"data":    data,
 		})
 		return
 	}
@@ -177,5 +189,9 @@ func TodoDelete(c *gin.Context) {
 	initializers.DB.Delete(&models.Todo{}, id)
 
 	// Respond
-	c.Status(200)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Success",
+		"data":    data,
+	})
 }
